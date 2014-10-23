@@ -52,6 +52,28 @@ function get_links_from_posts()
     return $data;
 }
 
+/**
+ * replace all links specified in $replacingList in the post
+ * @param  int $postId Id of the wp post
+ * @param  array $replacingList associative multidimensional array which contains long and shorten urls. e.g array(array('long_link' => 'short_link'))
+ */
+function replace_long_by_shorten_links($postId, $replacingList) 
+{
+    global $wpdb;
+
+    $post = get_post($postId);
+    $post_content = $post->post_content;
+
+    foreach ($replacingList as $replaceContent) {
+        $post_content = str_replace($replaceContent['source_link'], $replaceContent['result_link'], $post_content);
+    }    
+    $updatePostQuery = "UPDATE $wpdb->posts 
+                        SET $wpdb->posts.post_content = $post_content 
+                        WHERE $wpdb->posts.ID = $post->ID";
+    echo $updatePostQuery;
+    // $wpdb->query($updatePostQuery);
+}
+
 function shorten_url($url)
 {
     require_once('libs/GoogleUrlApi.php');

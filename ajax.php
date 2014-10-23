@@ -20,6 +20,11 @@ if (isset($_POST['action'])) {
 			}
 
 			break;
+		case 'replace':
+			if (isset($_POST['data'])) {
+				$result = $_POST['data'];
+				replace_long_by_shorten_links($result['postId'], $result['links']);
+			}
 
 	}
 }
