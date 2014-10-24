@@ -28,7 +28,6 @@ function ajax_shortener()
 {
 
     wp_register_script('shortener_script', WP_PLUGIN_URL . '/short_link_maker/js/ajax_shortener.js');
-    wp_register_script('jsonprune', WP_PLUGIN_URL . '/short_link_maker/js/JSON.prune.js');
     wp_register_script('initial_script', WP_PLUGIN_URL . '/short_link_maker/js/init.js');
     wp_localize_script('initial_script', 'ajax_obj', array('ajaxurl' => plugins_url() . '/short_link_maker/ajax.php'));
     wp_enqueue_script( 'jquery' );
