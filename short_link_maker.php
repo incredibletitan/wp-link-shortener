@@ -31,7 +31,6 @@ function ajax_shortener()
     wp_register_script('initial_script', WP_PLUGIN_URL . '/short_link_maker/js/init.js');
     wp_localize_script('initial_script', 'ajax_obj', array('ajaxurl' => plugins_url() . '/short_link_maker/ajax.php'));
     wp_enqueue_script( 'jquery' );
-    wp_enqueue_script( 'jsonprune' );
     wp_enqueue_script('initial_script' );
 }
 
@@ -39,7 +38,7 @@ function ajax_shortener()
 function short_link_menu()
 {
     if (function_exists('add_menu_page')) {
-        add_menu_page('Replace link by it\'s short name', 'Replace links names', 'administrator', 'short_link_maker\replace.php');
+        add_menu_page('Replace link by it\'s short name', 'Replace links names', 'administrator', 'short_link_maker\view.php');
     }
 }
 

@@ -5,8 +5,17 @@
  */
 
 jQuery(document).ready(function() {
-	jQuery('#shortener-form > div > input.process').click(function(){
+	filterLinksCounter = 1;
+	
+	jQuery('.duplicate').click(function(){
+		clonedInput = jQuery('.links-filter-container .filtered-link-container').first().clone();
+		id = filterLinksCounter++;
+		clonedInput.find('.filter-link').attr('id', 'filtered-link' + id);
+		clonedInput.find('.error').attr('id', 'filtered-link-error' + id);
+		jQuery('.links-filter-container').append(clonedInput);
+	});
 
+	jQuery('#shortener-form > div > input.process').click(function(){
 		//Get all links 
 		jQuery.ajax({
 
