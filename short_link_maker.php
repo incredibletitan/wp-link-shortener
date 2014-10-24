@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: URL shortener
+Plugin Name: Post urls shortener
 Plugin URI: http://wordpress.pretender.fmt/
 Description: Replacing all external links for short link
 Version: 1.0

@@ -67,11 +67,7 @@ function replace_long_by_shorten_links($postId, $replacingList)
     foreach ($replacingList as $replaceContent) {
         $post_content = str_replace($replaceContent['source_link'], $replaceContent['result_link'], $post_content);
     }    
-    $updatePostQuery = "UPDATE $wpdb->posts 
-                        SET $wpdb->posts.post_content = $post_content 
-                        WHERE $wpdb->posts.ID = $post->ID";
-    echo $updatePostQuery;
-    // $wpdb->query($updatePostQuery);
+    $wpdb->query( $wpdb->prepare( "UPDATE $wpdb->posts SET post_content = %s WHERE ID = %d", $post_content, $postId ) );
 }
 
 function shorten_url($url)
