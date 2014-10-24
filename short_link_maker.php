@@ -40,16 +40,10 @@ function ajax_shortener()
 function short_link_menu()
 {
     if (function_exists('add_menu_page')) {
-        add_menu_page('Replace link by it\'s short name', 'Replace links names', 'administrator', 'short_link_maker\view.php');
+        add_menu_page('Replace link by it\'s short name', 'Replace links names', 'administrator', 'short_link_maker\replace.php');
     }
 }
 
-add_action( 'wp_ajax_init', 'init_callback' );
-
-function init_callback() {
-	global $wpdb; // this is how you get access to the database
-	die(); // this is required to terminate immediately and return a proper response
-}
 
 add_action('admin_menu', 'short_link_menu');
 add_action('init', 'ajax_shortener');
