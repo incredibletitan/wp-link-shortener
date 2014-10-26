@@ -6,16 +6,43 @@
 
 jQuery(document).ready(function() {
 	filterLinksCounter = 1;
-	
+
+	jQuery('.delete').click(function(){
+
+		if (filterLinksCounter <= 1) {
+			return;
+		}
+		jQuery('.links-filter-container .filtered-link-container').last().remove();
+		filterLinksCounter--;
+	});
+
 	jQuery('.duplicate').click(function(){
-		clonedInput = jQuery('.links-filter-container .filtered-link-container').first().clone();
+		clonedContainer = jQuery('.links-filter-container .filtered-link-container').first().clone();
 		id = filterLinksCounter++;
-		clonedInput.find('.filter-link').attr('id', 'filtered-link' + id);
-		clonedInput.find('.error').attr('id', 'filtered-link-error' + id);
-		jQuery('.links-filter-container').append(clonedInput);
+		clonedInput = clonedContainer.find('.filter-link');
+		clonedErrorSpan = clonedContainer.find('.error');
+		clonedInput.val('');
+		clonedInput.attr('id', 'filtered-link' + id);
+		clonedErrorSpan.attr('id', 'filtered-link-error' + id);
+		clonedErrorSpan.css('display', 'none');
+		jQuery('.links-filter-container').append(clonedContainer);
 	});
 
 	jQuery('#shortener-form > div > input.process').click(function(){
+		jQuery('.error').css('display', 'none');
+
+		regex = /^(https?:\/\/)?(([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*)\/?$/;
+
+		for (i = 0; i < filterLinksCounter; i++) {
+			filterLink = jQuery('#filtered-link' + i);
+
+			if (!regex.test(filterLink.val())) {
+				jQuery('#filtered-link-error' + i).css('display', 'inline');
+			}
+		}
+
+		return;
+
 		//Get all links 
 		jQuery.ajax({
 
