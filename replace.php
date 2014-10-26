@@ -5,7 +5,7 @@
  */
 
 
-function get_links_from_posts()
+function get_links_from_posts(array $links_filter = null, array $post_filter = null )
 {
 
     //Global WP DB connection
@@ -14,10 +14,58 @@ function get_links_from_posts()
     //Get all or by filter posts
     $query =
         "SELECT $wpdb->posts.* " .
-            "FROM $wpdb->posts " .
-            "WHERE $wpdb->posts.post_type = 'post'" .
-            "AND $wpdb->posts.post_status = 'publish'";
+            " FROM $wpdb->posts " .
+            " WHERE $wpdb->posts.post_type = 'post' " .
+            " AND $wpdb->posts.post_status = 'publish' ";
 
+    if (null != $links_filter) {
+        $likeStatement = '';
+
+        $linksCount = count($links_filter);
+        $isTheFirstStatementAchieved = false;  
+        
+        for ($i = 0; $i < $linksCount; $i++) {
+            $urlRegex = "/^(https?:\/\/)?(([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*)\/?$/";
+            $matches = array();
+           
+            //checking is it valid url 
+            if (preg_match($urlRegex, $links_filter[$i], $matches)) {
+                $matchedLink = $matches[2];
+
+                //if it first valid link add to statement 'AND' and '('
+                if (!$isTheFirstStatementAchieved ) {
+                    $likeStatement .= " AND ($wpdb->posts.post_content LIKE '%" . $matchedLink . "%'";
+                    $isTheFirstStatementAchieved  = true;
+                } 
+                // add 'OR'
+                else {
+                    $likeStatement .= " OR $wpdb->posts.post_content LIKE '%" . $matchedLink . "%'";
+                }
+            }
+
+            //If it is last statement and it is not empty query add ')'
+            if (($linksCount - 1) == $i && $isTheFirstStatementAchieved) {
+                $likeStatement .= ') ';
+            }
+        }
+        $query .= $likeStatement;
+    }
+
+    //Filtering by post id
+    if (null != $post_filter) {
+        $inStatement = " AND $wpdb->posts.ID  IN (";
+        $postFilterCount = count($post_filter);
+
+        for ($i = 0; $i < $postFilterCount; $i++) {
+            if ($i != ($postFilterCount - 1)) {
+                $inStatement .= $post_filter[$i] . ',';
+            } else {
+                $inStatement .= $post_filter[$i];
+            }
+        }
+        $inStatement .= ') ';
+        $query .= $inStatement;
+    }
     $posts = $wpdb->get_results($query, OBJECT);
     $data = array();
     $dom = new DOMDocument();
@@ -45,7 +93,6 @@ function get_links_from_posts()
                 continue;
             }
             $data[$post->ID]['links'][] =  $link;
-            
         }
     }
 
@@ -67,18 +114,13 @@ function replace_long_by_shorten_links($postId, $replacingList)
     foreach ($replacingList as $replaceContent) {
         $post_content = str_replace($replaceContent['source_link'], $replaceContent['result_link'], $post_content);
     }    
-    $updatePostQuery = "UPDATE $wpdb->posts 
-                        SET $wpdb->posts.post_content = $post_content 
-                        WHERE $wpdb->posts.ID = $post->ID";
-    echo $updatePostQuery;
-    // $wpdb->query($updatePostQuery);
+    $wpdb->query( $wpdb->prepare( "UPDATE $wpdb->posts SET post_content = %s WHERE ID = %d", $post_content, $postId ) );
 }
 
 function shorten_url($url)
 {
     require_once('libs/GoogleUrlApi.php');
     $key = 'AIzaSyCDCVUrfj5LYpSSJEqyxFhJqfEQokIyw1E';
-
     $shortenerApi = new GoogleUrlApi($key);
     $shortenerApi->setProxy('pretender:KTq94LsLcX@192.168.5.111:3128');
 

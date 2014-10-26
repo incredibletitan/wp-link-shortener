@@ -1,6 +1,10 @@
 <?php
 /*
+<<<<<<< HEAD
 Plugin Name: post url's shortener
+=======
+Plugin Name: Post urls shortener
+>>>>>>> 4976cd5fccd7400e4d5ba76c177905ea415f2e10
 Plugin URI: http://wordpress.pretender.fmt/
 Description: Replacing all external links for short link
 Version: 1.0
@@ -31,7 +35,6 @@ function ajax_shortener()
     wp_register_script('initial_script', WP_PLUGIN_URL . '/short_link_maker/js/init.js');
     wp_localize_script('initial_script', 'ajax_obj', array('ajaxurl' => plugins_url() . '/short_link_maker/ajax.php'));
     wp_enqueue_script( 'jquery' );
-    wp_enqueue_script( 'jsonprune' );
     wp_enqueue_script('initial_script' );
 }
 
@@ -43,12 +46,6 @@ function short_link_menu()
     }
 }
 
-add_action( 'wp_ajax_init', 'init_callback' );
-
-function init_callback() {
-	global $wpdb; // this is how you get access to the database
-	die(); // this is required to terminate immediately and return a proper response
-}
 
 add_action('admin_menu', 'short_link_menu');
 add_action('init', 'ajax_shortener');
