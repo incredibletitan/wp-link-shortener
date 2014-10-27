@@ -1,5 +1,4 @@
 <?php
-//todo find way to load $wpdb more correctly
 include_once('../../../wp-load.php');
 include_once("replace.php");
 

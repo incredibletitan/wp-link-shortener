@@ -75,7 +75,7 @@ function get_links_from_posts(array $links_filter = null, array $post_filter = n
         if (empty($post->post_content)) {
             continue;
         }
-        $dom->loadHTML($post->post_content);
+        @$dom->loadHTML($post->post_content);
         $aTags = $dom->getElementsByTagName('a');
 
         foreach ($aTags as $a) {
