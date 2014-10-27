@@ -32,17 +32,24 @@ jQuery(document).ready(function() {
 		jQuery('.error').css('display', 'none');
 		linksArr = [];
 		regex = /^(https?:\/\/)?(([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*)\/?$/;
+		isErrorExists = false;
 
 		for (i = 0; i < filterLinksCounter; i++) {
 			filterLink = jQuery('#filtered-link' + i);
 
 			if (!regex.test(filterLink.val())) {
 				jQuery('#filtered-link-error' + i).css('display', 'inline');
-			
+				isErrorExists = true;			
 				continue;
 			}
 			linksArr.push(filterLink.val());
 		}
+
+		if (isErrorExists) {
+			return;
+		}
+		jQuery('.preloader').css('display', 'block');
+		jQuery('.shortener-container').css('display', 'none');
 
 		//Get all links 
 		jQuery.ajax({
@@ -54,8 +61,17 @@ jQuery(document).ready(function() {
 
 			//Shorten links
 			success: function(data) {
+
 				try {
-					dataJson = jQuery.parseJSON(data);
+					dataJson = JSON.parse(data);
+					
+					if (dataJson.length < 1) {
+						console.log('No links');
+						jQuery('.preloader').css('display', 'none');
+						jQuery('.shortener-container').css('display', 'block');		
+						
+						return;
+					}
 					jQuery.each(dataJson, function(postId, postLinksData) {
 
 					var processedLinks = {postId : postId};
@@ -79,6 +95,8 @@ jQuery(document).ready(function() {
 										var processedLink = jQuery.parseJSON(shortenData);
 										processedLinks.links.push(processedLink);
 									} catch (e) {
+										jQuery('.preloader').css('display', 'none');
+										jQuery('.shortener-container').css('display', 'block');
 										console.log(e);
 									}
 								}
@@ -96,12 +114,14 @@ jQuery(document).ready(function() {
 								},
 								
 								success: function(result) {
-									console.log(result);
+									jQuery('.preloader').css('display', 'none');
+									jQuery('.shortener-container').css('display', 'block');
 								}, 
 							});
 					});	
 				} catch (e) {
-					console.log(e);
+					jQuery('.preloader').css('display', 'none');
+					jQuery('.shortener-container').css('display', 'block');
 				}
 			}
 		});

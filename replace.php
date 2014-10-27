@@ -130,7 +130,7 @@ function replace_long_by_shorten_links($postId, $replacingList)
 function shorten_url($url)
 {
     require_once('libs/GoogleUrlApi.php');
-    $key = 'AIzaSyCDCVUrfj5LYpSSJEqyxFhJqfEQokIyw1E';
+    $key = get_option('google_api_key_settings');
     $shortenerApi = new GoogleUrlApi($key);
 
     //stub for proxy
