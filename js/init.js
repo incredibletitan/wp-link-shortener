@@ -30,7 +30,7 @@ jQuery(document).ready(function() {
 
 	jQuery('#shortener-form > div > input.process').click(function(){
 		jQuery('.error').css('display', 'none');
-
+		linksArr = [];
 		regex = /^(https?:\/\/)?(([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*)\/?$/;
 
 		for (i = 0; i < filterLinksCounter; i++) {
@@ -38,10 +38,11 @@ jQuery(document).ready(function() {
 
 			if (!regex.test(filterLink.val())) {
 				jQuery('#filtered-link-error' + i).css('display', 'inline');
+			
+				continue;
 			}
+			linksArr.push(filterLink.val());
 		}
-
-		return;
 
 		//Get all links 
 		jQuery.ajax({
@@ -49,50 +50,59 @@ jQuery(document).ready(function() {
 			//url which passed withing wp_localize_script in short_link_maker.php file
 			url: ajax_obj.ajaxurl,
 			type: 'POST',
-			data: {	action: 'get_links'	},
+			data: {	action: 'get_links', links_list: linksArr},
 
 			//Shorten links
 			success: function(data) {
-				dataJson = jQuery.parseJSON(data);
-				jQuery.each(dataJson, function(postId, postLinksData) {
+				try {
+					dataJson = jQuery.parseJSON(data);
+					jQuery.each(dataJson, function(postId, postLinksData) {
 
-				var processedLinks = {postId : postId};
-				processedLinks.links = [];
-				 
+					var processedLinks = {postId : postId};
+					processedLinks.links = [];
+					 
 
-					jQuery.each(postLinksData.links, function(i, link){
-						
+						jQuery.each(postLinksData.links, function(i, link){
+							
+							jQuery.ajax({
+								async: false,
+								url: ajax_obj.ajaxurl,
+								type: 'POST',
+								data: {
+									action: 'shorten',
+									link: link
+								},
+								
+								success: function(shortenData) {
+
+									try {
+										var processedLink = jQuery.parseJSON(shortenData);
+										processedLinks.links.push(processedLink);
+									} catch (e) {
+										console.log(e);
+									}
+								}
+							});
+						});
+
+						//Send request for replace long links by shorten
 						jQuery.ajax({
-							async: false,
-							url: ajax_obj.ajaxurl,
-							type: 'POST',
-							data: {
-								action: 'shorten',
-								link: link
-							},
-							
-							success: function(shortenData) {
-								var processedLink = jQuery.parseJSON(shortenData);
-								processedLinks.links.push(processedLink);
-							}
-						});
-					});
+								url: ajax_obj.ajaxurl,
+								type: 'POST',
 
-					//Send request for replace long links by shorten
-					jQuery.ajax({
-							url: ajax_obj.ajaxurl,
-							type: 'POST',
-
-							data: {
-								action: 'replace',
-								data: processedLinks
-							},
-							
-							success: function(result) {
-								console.log(result);
-							}, 
-						});
-				});
+								data: {
+									action: 'replace',
+									data: processedLinks
+								},
+								
+								success: function(result) {
+									console.log(result);
+								}, 
+							});
+					});	
+				} catch (e) {
+					console.log(e);
+				}
 			}
 		});
 	});

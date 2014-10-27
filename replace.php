@@ -92,7 +92,17 @@ function get_links_from_posts(array $links_filter = null, array $post_filter = n
 
                 continue;
             }
-            $data[$post->ID]['links'][] =  $link;
+
+            //Filtering link using filter list
+            foreach ($links_filter as $fitered_link) {
+                if (strpos($link, $fitered_link) !== false) {
+                    $data[$post->ID]['links'][] =  $link;
+
+                    break;
+                }
+            }
+
+
         }
     }
 
@@ -122,9 +132,17 @@ function shorten_url($url)
     require_once('libs/GoogleUrlApi.php');
     $key = 'AIzaSyCDCVUrfj5LYpSSJEqyxFhJqfEQokIyw1E';
     $shortenerApi = new GoogleUrlApi($key);
-    $shortenerApi->setProxy('pretender:KTq94LsLcX@192.168.5.111:3128');
 
-    return $shortenerApi->shorten($url);
+    //stub for proxy
+    if (strpos($_SERVER['SERVER_NAME'], 'fmt') !== false) {
+        $shortenerApi->setProxy('pretender:KTq94LsLcX@192.168.5.111:3128');
+    }
+
+    if ($url) {
+        return $shortenerApi->shorten($url);
+    }
+
+    return false;
 }
 
 

@@ -4,8 +4,6 @@
 Plugin Name: post url's shortener
 =======
 Plugin Name: Post urls shortener
->>>>>>> 4976cd5fccd7400e4d5ba76c177905ea415f2e10
-Plugin URI: http://wordpress.pretender.fmt/
 Description: Replacing all external links for short link
 Version: 1.0
 Author: Pretender
@@ -43,6 +41,7 @@ function short_link_menu()
 {
     if (function_exists('add_menu_page')) {
         add_menu_page('Replace link by it\'s short name', 'Replace links names', 'administrator', 'short_link_maker\view.php');
+    	add_submenu_page('short_link_maker\view.php', 'Settings', 'Settings', 'administrator', 'short_link_maker\options.php');
     }
 }
 
